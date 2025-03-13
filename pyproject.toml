@@ -1,6 +1,6 @@
 [tool.mypy]
 python_version = "3.11"
-mypy_path = "app/"
+mypy_path = "src/"
 plugins = ["mypy_django_plugin.main"]
 check_untyped_defs = true
 namespace_packages = true

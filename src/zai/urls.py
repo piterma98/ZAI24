@@ -16,7 +16,6 @@ Including another URLconf
 """
 
 import debug_toolbar
-from api.graphql.schema import schema as user_schema
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -24,7 +23,8 @@ from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 from graphene_file_upload.django import FileUploadGraphQLView
-from graphql_jwt.decorators import jwt_cookie
+
+from api.graphql.schema import schema as user_schema
 
 
 class ApplicationGraphQLView(FileUploadGraphQLView, GraphQLView):
@@ -37,10 +37,10 @@ urlpatterns = [
         "graphql/",
         csrf_exempt(
             # jwt_cookie(
-                GraphQLView.as_view(
-                    schema=user_schema,
-                    graphiql=settings.DEBUG,
-                )
+            GraphQLView.as_view(
+                schema=user_schema,
+                graphiql=settings.DEBUG,
+            )
             # )
         ),
         name="user-graphql",

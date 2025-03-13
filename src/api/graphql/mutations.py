@@ -1,7 +1,5 @@
-import graphene
+from app_auth.user_schema.mutations import Mutation as AuthMutation
 
 
-class Mutation(
-    graphene.ObjectType
-):
+class Mutation(AuthMutation):
     pass

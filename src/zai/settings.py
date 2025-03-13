@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -53,6 +54,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "corsheaders",
     "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
+    "users.apps.UsersConfig",
+    "app_auth.apps.AuthConfig",
 ]
 
 MIDDLEWARE = [
@@ -61,8 +64,7 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    # "api.middleware.CustomSessionMiddleware",
+    "api.middleware.CustomSessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -124,7 +126,7 @@ CACHES = {
     }
 }
 
-# AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "users.User"
 
 GRAPHQL_JWT = {
     "JWT_COOKIE_NAME": "zai_access-token",
