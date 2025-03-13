@@ -1,0 +1,12 @@
+postgres*
+.git
+**/__pycache__
+**/.mypy_cache
+**/*.pyc
+**/.venv
+.coverage
+coverage.xml
+junit.xml
+**/prof/
+**/htmlcov/
+media

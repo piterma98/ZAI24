@@ -1,0 +1,64 @@
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "app/"
+plugins = ["mypy_django_plugin.main"]
+check_untyped_defs = true
+namespace_packages = true
+no_implicit_optional = true
+no_implicit_reexport = true
+strict_equality = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = [
+    "debug_toolbar.*",
+    "django_filters.*",
+    "factory.*",
+    "graphene_django.*",
+    "graphene_file_upload.*",
+    "graphene.*",
+    "graphql_jwt.*",
+    "jose.*",
+    ]
+ignore_missing_imports = true
+
+
+[tool.django-stubs]
+django_settings_module = "zai.settings"
+
+[tool.ruff]
+line-length = 120
+extend-exclude = [
+    ".venv",
+    "migrations"
+]
+format.docstring-code-format = true
+format.docstring-code-line-length = 60
+format.indent-style = "space"
+format.quote-style = "double"
+lint.select = [
+    "E",
+    "F",
+    "W",
+    "I"
+]
+
+[tool.coverage.report]
+omit = [
+    "tests/*",
+    "*/site-packages/*",
+    "venv/lib/*",
+    "scripts/*",
+    "admin.py",
+    "settings.py",
+    "urls.py",
+]
+
+[tool.pytest.ini_options]
+env=[
+    "FILE_UPLOAD_STORAGE=local",
+]
+norecursedirs = "postgres_zai"
+addopts = "--no-migrations"
+DJANGO_SETTINGS_MODULE = "zai.settings"
+python_files = "tests.py test_*.py *_tests.py"

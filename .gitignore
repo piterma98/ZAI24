@@ -1,0 +1,17 @@
+*.pyc
+__pycache__
+.mypy_cache
+.pytest_cache
+.ruff_cache
+*.sqlite3
+.env
+venv/
+.venv/
+.idea/
+postgres*
+.coverage
+htmlcov/
+coverage.xml
+*.sentinel
+static/
+media/

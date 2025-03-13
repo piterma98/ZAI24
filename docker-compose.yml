@@ -1,0 +1,35 @@
+volumes:
+  media:
+
+services:
+  postgres_zai:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - type: bind
+        source: ./postgres_zai/
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: true
+    ports:
+      - target: 5432
+        published: 1303
+        mode: host
+
+  zai:
+    build: .
+    environment:
+      DEBUG: "True"
+      DB_HOST: postgres_zai
+      DB_PORT: 5432
+      BASE_URL: "http://127.0.0.1:8000/"
+      APP_PATH: "/"
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: bind
+        source: ./app/media/
+        target: /home/user/app/media
+        bind:
+          create_host_path: true
