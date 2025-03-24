@@ -1,8 +1,13 @@
 import itertools
+from typing import TypeVar
 
 from django.contrib import admin
 from django.db import models
+from django.db.models import Q, QuerySet, Value
+from django_filters.filters import CharFilter
 from graphql_relay import to_global_id
+
+M = TypeVar("M", bound=models.Model)
 
 
 class TimeStampMixin(models.Model):
@@ -26,3 +31,17 @@ class GrapheneModelMixin:
     @property
     def gid(self) -> str:
         return to_global_id(self.__class__.__name__, self.id)
+
+
+class SearchableFilterSetMixin:
+    search_fields: list[str] = []
+
+    search = CharFilter(method="search_filter")
+
+    def search_filter(self, queryset: QuerySet[M], name: str, value: str) -> QuerySet[M]:
+        if not value:
+            return queryset
+        q = Q()
+        for search_field in self.search_fields:
+            q.add(Q(**{f"{search_field}__icontains": Value(value)}), Q.OR)
+        return queryset.filter(q)

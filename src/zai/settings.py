@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "graphene_django",
     "debug_toolbar",
     "corsheaders",
+    "django_filters",
     "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
     "users.apps.UsersConfig",
     "app_auth.apps.AuthConfig",
@@ -60,7 +61,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
