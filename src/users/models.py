@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from model_utils import GrapheneModelMixin, TimeStampMixin
+from users.exceptions import IncorrectPasswordError, SamePasswordError
 from users.manager import CustomUserManager
 
 
@@ -25,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin, GrapheneModelMixi
     )
     is_active = models.BooleanField(
         _("active"),
-        default=False,
+        default=True,
         help_text=_(
             "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
         ),
@@ -62,3 +63,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin, GrapheneModelMixi
 
     def __str__(self) -> str:
         return f"User({self.email=})"
+
+    def change_password(self, old_password: str, new_password: str) -> None:
+        if not self.check_password(old_password):
+            raise IncorrectPasswordError("Old password is incorrect")
+        if self.check_password(new_password):
+            raise SamePasswordError("New password is the same as old password")
+        self.set_password(new_password)

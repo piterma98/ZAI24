@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
     "users.apps.UsersConfig",
     "app_auth.apps.AuthConfig",
+    "phonebook.apps.PhonebookConfig",
 ]
 
 MIDDLEWARE = [
@@ -89,7 +90,7 @@ ROOT_URLCONF = "zai.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -194,3 +195,36 @@ CORS_ALLOW_CREDENTIALS = True
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "time=%(asctime)s level=%(levelname)s location=%(name)s.%(funcName)s msg=%(message)s",
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "app_auth": {"handlers": ["console"], "level": "INFO"},
+        "users": {"handlers": ["console"], "level": "INFO"},
+        "phonebook": {"handlers": ["console"], "level": "INFO"},
+        "api": {"handlers": ["console"], "level": "INFO"},
+        "graphql.execution": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
