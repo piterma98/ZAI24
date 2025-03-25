@@ -1,8 +1,9 @@
 from typing import Callable, ParamSpec, TypeVar
 
 import graphene
+from graphql_relay import from_global_id
 
-from api.exceptions import AuthenticationError
+from api.exceptions import AuthenticationError, InputIdTypeMismatchError
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -25,3 +26,13 @@ def login_required(func: GraphqlMethod) -> Callable[[GraphqlMethod], GraphqlMeth
         return func(*args, **kwargs)
 
     return resolve_or_mutate
+
+
+def validate_gid(object_id: str, class_name: str) -> str:
+    """
+    Decode a global ID and raise InputIdTypeMismatchError if expected class does not match.
+    """
+    object_class_name, object_id = from_global_id(object_id)
+    if object_class_name != class_name:
+        raise InputIdTypeMismatchError(message=f"{object_id=} is not an {class_name}")
+    return object_id

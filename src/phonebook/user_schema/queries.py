@@ -4,15 +4,25 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
 from phonebook.filters import PhonebookFilterSet
-from phonebook.models import PhonebookEntry, PhonebookEntryTypeEnum, PhonebookGroup, PhonebookNumber
+from phonebook.models import (
+    PhonebookEntry,
+    PhonebookEntryTypeEnum,
+    PhonebookGroup,
+    PhonebookNumber,
+    PhonebookNumberTypeEnum,
+)
 
 TypeEnum = graphene.Enum.from_enum(PhonebookEntryTypeEnum, name="PhonebookEntryTypeEnum")
+NumberTypeEnum = graphene.Enum.from_enum(PhonebookNumberTypeEnum, name="PhonebookNumberTypeEnum")
 
 
 class PhonebookNumbersNode(DjangoObjectType):
+    type = NumberTypeEnum()
+
     class Meta:
         model = PhonebookNumber
         fields = ("number",)
+        interfaces = (graphene.relay.Node,)
 
 
 class PhonebookGroupNode(DjangoObjectType):
@@ -23,7 +33,7 @@ class PhonebookGroupNode(DjangoObjectType):
 
 class PhonebookEntryNode(DjangoObjectType):
     type = TypeEnum()
-    numbers = graphene.List(graphene.String)
+    numbers = graphene.List(PhonebookNumbersNode)
     groups = graphene.List(graphene.String)
 
     class Meta:
@@ -37,14 +47,14 @@ class PhonebookEntryNode(DjangoObjectType):
         queryset = cls.get_queryset(cls._meta.model.objects, info)
         try:
             obj = queryset.get(pk=id)
-            if obj.account.created_by == info.context.user:
+            if obj.created_by == info.context.user:
                 return obj
             return None
         except cls._meta.model.DoesNotExist:
             return None
 
     def resolve_numbers(self, info: graphene.ResolveInfo) -> list[str]:
-        return self.numbers.all().values_list("number", flat=True)
+        return self.phonebook_number.all()
 
     def resolve_groups(self, info: graphene.ResolveInfo) -> list[str]:
         return self.groups.all().values_list("name", flat=True)
@@ -54,10 +64,10 @@ class Query(graphene.ObjectType):
     phonebook_entry = DjangoFilterConnectionField(PhonebookEntryNode)
     phonebook_entry_count = graphene.Int()
 
-    def resolve_phonebook_entry(self, info: graphene.ResolveInfo) -> QuerySet[PhonebookEntry]:
+    def resolve_phonebook_entry(self, info: graphene.ResolveInfo, **kwargs) -> QuerySet[PhonebookEntry]:
         # check number of queries
-        return PhonebookEntry.objects.prefetch_related("numbers", "groups").all()
+        return PhonebookEntry.objects.prefetch_related("groups", "phonebook_number").all()
 
-    def resolve_phonebook_entry_count(self, info: graphene.ResolveInfo) -> int:
+    def resolve_phonebook_entry_count(self, info: graphene.ResolveInfo, **kwargs) -> int:
         # check number of queries
         return PhonebookEntry.objects.all().count()

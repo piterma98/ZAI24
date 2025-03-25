@@ -31,9 +31,9 @@ class Me(graphene.ObjectType):
     def resolve_last_name(self, info: graphene.ResolveInfo) -> str:
         return self.user.lastname
 
-    def resolve_my_phonebook_entry(self, info: graphene.ResolveInfo) -> QuerySet[PhonebookEntry]:
+    def resolve_my_phonebook_entry(self, info: graphene.ResolveInfo, **kwargs) -> QuerySet[PhonebookEntry]:
         # check number of queries
-        return PhonebookEntry.objects.prefetch_related("numbers", "groups").filter(created_by=info.context.request.user)
+        return PhonebookEntry.objects.prefetch_related("numbers", "groups").filter(created_by=info.context.user)
 
 
 class MeQuery(graphene.ObjectType):

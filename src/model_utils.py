@@ -4,7 +4,6 @@ from typing import TypeVar
 from django.contrib import admin
 from django.db import models
 from django.db.models import Q, QuerySet, Value
-from django_filters.filters import CharFilter
 from graphql_relay import to_global_id
 
 M = TypeVar("M", bound=models.Model)
@@ -34,9 +33,13 @@ class GrapheneModelMixin:
 
 
 class SearchableFilterSetMixin:
-    search_fields: list[str] = []
+    """
+    Mixin for FilterSet search implementation.
+    Add search = CharFilter(method="search_filter")
+    field to FilterSet class to make it work.
+    """
 
-    search = CharFilter(method="search_filter")
+    search_fields: list[str]
 
     def search_filter(self, queryset: QuerySet[M], name: str, value: str) -> QuerySet[M]:
         if not value:

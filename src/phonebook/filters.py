@@ -1,12 +1,18 @@
-from django_filters import FilterSet
+from django_filters import CharFilter, FilterSet, OrderingFilter
 
 from model_utils import SearchableFilterSetMixin
 from phonebook.models import PhonebookEntry
 
 
-class PhonebookFilterSet(FilterSet, SearchableFilterSetMixin):
+class PhonebookFilterSet(SearchableFilterSetMixin, FilterSet):
     class Meta:
         model = PhonebookEntry
         fields = {"type": ["exact"], "city": ["exact"]}
 
-    search_fields: list[str] = ["name"]
+    search_fields: list[str] = ["name", "city"]
+    search = CharFilter(method="search_filter")
+    order_by = OrderingFilter(
+        fields={
+            "created_at": "created_at",
+        }
+    )

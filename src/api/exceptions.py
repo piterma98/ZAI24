@@ -11,3 +11,7 @@ class AuthenticationError(GraphQLError):
 
     def __init__(self):
         super().__init__(message=self.__class__.__name__)
+
+
+class InputIdTypeMismatchError(GraphQLError):
+    pass
