@@ -2,7 +2,7 @@ from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from model_utils import TimeStampMixin
+from model_utils import GrapheneModelMixin, TimeStampMixin
 
 
 class PhonebookEntryTypeEnum(models.TextChoices):
@@ -22,7 +22,7 @@ class PhonebookGroup(TimeStampMixin):
         return f"PhonebookGroup({self.name=})"
 
 
-class PhonebookEntry(TimeStampMixin):
+class PhonebookEntry(TimeStampMixin, GrapheneModelMixin):
     name = models.TextField(max_length=300, validators=[MaxLengthValidator(300)])
     city = models.TextField(max_length=50, validators=[MaxLengthValidator(50)])
     street = models.TextField(max_length=50, validators=[MaxLengthValidator(50)])
@@ -45,3 +45,6 @@ class PhonebookNumber(TimeStampMixin):
     phonebook_entry = models.ForeignKey(PhonebookEntry, on_delete=models.CASCADE, related_name="phonebook_number")
     number = models.TextField(max_length=20, null=True, validators=[MaxLengthValidator(20)])
     type = models.TextField(choices=PhonebookNumberTypeEnum.choices)
+
+    def __str__(self) -> str:
+        return f"PhonebookNumber({self.phonebook_entry=}, {self.number=}, {self.type=})"

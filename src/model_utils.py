@@ -29,7 +29,7 @@ class GrapheneModelMixin:
 
     @property
     def gid(self) -> str:
-        return to_global_id(self.__class__.__name__, self.id)
+        return to_global_id(f"{self.__class__.__name__}Node", self.id)
 
 
 class SearchableFilterSetMixin:
@@ -47,4 +47,4 @@ class SearchableFilterSetMixin:
         q = Q()
         for search_field in self.search_fields:
             q.add(Q(**{f"{search_field}__icontains": Value(value)}), Q.OR)
-        return queryset.filter(q)
+        return queryset.filter(q).distinct()

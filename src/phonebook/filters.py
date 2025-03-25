@@ -9,7 +9,7 @@ class PhonebookFilterSet(SearchableFilterSetMixin, FilterSet):
         model = PhonebookEntry
         fields = {"type": ["exact"], "city": ["exact"]}
 
-    search_fields: list[str] = ["name", "city"]
+    search_fields: list[str] = ["name", "city", "groups__name"]
     search = CharFilter(method="search_filter")
     order_by = OrderingFilter(
         fields={

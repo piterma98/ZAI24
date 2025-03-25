@@ -16,7 +16,7 @@ TypeEnum = graphene.Enum.from_enum(PhonebookEntryTypeEnum, name="PhonebookEntryT
 NumberTypeEnum = graphene.Enum.from_enum(PhonebookNumberTypeEnum, name="PhonebookNumberTypeEnum")
 
 
-class PhonebookNumbersNode(DjangoObjectType):
+class PhonebookNumberNode(DjangoObjectType):
     type = NumberTypeEnum()
 
     class Meta:
@@ -33,12 +33,12 @@ class PhonebookGroupNode(DjangoObjectType):
 
 class PhonebookEntryNode(DjangoObjectType):
     type = TypeEnum()
-    numbers = graphene.List(PhonebookNumbersNode)
+    numbers = graphene.List(PhonebookNumberNode)
     groups = graphene.List(graphene.String)
 
     class Meta:
         model = PhonebookEntry
-        fields = ("name", "city", "street", "postal_code")
+        fields = ("name", "city", "street", "postal_code", "country")
         interfaces = (graphene.relay.Node,)
         filterset_class = PhonebookFilterSet
 

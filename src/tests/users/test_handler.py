@@ -1,6 +1,6 @@
 import pytest
 
-from users.exceptions import ChangePasswordException, RegisterException
+from users.exceptions import ChangePasswordException, RegisterException, UpdateUserException
 from users.handler import UserHandler
 from users.models import User
 
@@ -106,3 +106,11 @@ def test_change_password_same_password(data_fixture) -> None:
         UserHandler().change_password(old_password="testing", new_password="testing", user_id=user.id)
 
     assert e.value.reason == "New password is the same as old password"
+
+
+@pytest.mark.django_db
+def test_update_user_does_not_exist() -> None:
+    with pytest.raises(UpdateUserException) as e:
+        UserHandler().update_user(user_id=1)
+
+    assert e.value.reason == "Error while updating user!"

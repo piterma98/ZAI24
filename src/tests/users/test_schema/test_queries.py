@@ -33,3 +33,20 @@ def test_user_query_me(data_fixture, user_schema_client) -> None:
 
     assert "errors" not in result
     assert result["data"] == expected
+
+
+def test_user_query_unauthenticated(user_schema_anonymous_client) -> None:
+    query = """
+          query Me {
+            me {
+              id
+              email
+              lastName
+              firstName
+            }
+          }
+        """
+
+    result = user_schema_anonymous_client.execute(query)
+
+    assert result["errors"][0]["message"] == "AuthenticationError"

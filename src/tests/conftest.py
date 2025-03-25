@@ -26,14 +26,19 @@ class UserSchemaClient:
     def __init__(self, schema: Schema, user: User | AnonymousUser | None = None) -> None:
         self.schema = schema
         self.user = user
+        self.cookies: dict[str, Any] = {}
+
+    def set_cookie(self, cookies: dict[str, Any]) -> None:
+        self.cookies = cookies
 
     def execute(self, query: str, variables: dict[str, Any] | None = None):
         class TestContext:
-            def __init__(self, user):
+            def __init__(self, user, cookies):
                 self.user = user
+                self.COOKIES = cookies
                 self.jwt_cookie = True
 
-        context = TestContext(user=self.user)
+        context = TestContext(user=self.user, cookies=self.cookies)
         client = Client(self.schema, context_value=context)
         return client.execute(query, variable_values=variables)
 
