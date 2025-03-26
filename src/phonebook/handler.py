@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
+from phonebook.exceptions import PhonebookError
 from phonebook.models import PhonebookEntry, PhonebookGroup, PhonebookNumber
 from users.models import User
 
@@ -14,12 +15,6 @@ logger = logging.getLogger(__name__)
 class AddPhonebookEntryNumberData:
     number_type: str
     number: str
-
-
-class PhonebookError(Exception):
-    def __init__(self, reason: str, **kwargs):
-        super().__init__(**kwargs)
-        self.reason = reason
 
 
 class PhonebookHandler:

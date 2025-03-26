@@ -1,6 +1,7 @@
 import pytest
 
-from phonebook.handler import AddPhonebookEntryNumberData, PhonebookError, PhonebookHandler
+from phonebook.exceptions import PhonebookError
+from phonebook.handler import AddPhonebookEntryNumberData, PhonebookHandler
 from phonebook.models import PhonebookEntry, PhonebookNumber
 
 

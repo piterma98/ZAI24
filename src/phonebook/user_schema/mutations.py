@@ -5,7 +5,8 @@ from graphene import ClientIDMutation
 
 from api.exceptions import InputIdTypeMismatchError
 from api.graphql_utils import login_required, validate_gid
-from phonebook.handler import AddPhonebookEntryNumberData, PhonebookError, PhonebookHandler
+from phonebook.exceptions import PhonebookError
+from phonebook.handler import AddPhonebookEntryNumberData, PhonebookHandler
 from phonebook.user_schema.queries import NumberTypeEnum, PhonebookEntryNode, TypeEnum
 
 logger = logging.getLogger(__name__)
@@ -66,13 +67,7 @@ class AddPhonebookEntry(ClientIDMutation):
                 country=country,
                 type=type,
                 groups=groups,
-                numbers=[
-                    AddPhonebookEntryNumberData(
-                        number=number.number,
-                        number_type=number.number_type,
-                    )
-                    for number in numbers
-                ],
+                numbers=numbers,
                 created_by=info.context.user,
             )
             return cls(result=AddPhonebookEntrySuccess(phonebook=entry))
