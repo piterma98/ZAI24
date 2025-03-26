@@ -152,7 +152,7 @@ class DeletePhonebookEntryResult(graphene.Union):
 
 class DeletePhonebookEntry(ClientIDMutation):
     class Input:
-        photo_id = graphene.ID(required=True)
+        entry_id = graphene.ID(required=True)
 
     result = graphene.Field(DeletePhonebookEntryResult)
 
@@ -162,11 +162,11 @@ class DeletePhonebookEntry(ClientIDMutation):
         cls,
         root,
         info: graphene.ResolveInfo,
-        phonebook_entry_id: str,
+        entry_id: str,
     ) -> "DeletePhonebookEntry":
         try:
             PhonebookHandler().delete(
-                user=info.context.user, entry_id=int(validate_gid(phonebook_entry_id, "PhonebookEntryNode"))
+                user=info.context.user, entry_id=int(validate_gid(entry_id, "PhonebookEntryNode"))
             )
             return cls(result=DeletePhonebookEntrySuccess(is_deleted=True))
         except InputIdTypeMismatchError:
@@ -190,7 +190,7 @@ class AddPhonebookEntryGroupResult(graphene.Union):
 
 class AddPhonebookEntryGroup(ClientIDMutation):
     class Input:
-        phonebook_entry_id = graphene.ID(required=True)
+        entry_id = graphene.ID(required=True)
         group = graphene.String(required=True)
 
     result = graphene.Field(AddPhonebookEntryGroupResult)
@@ -201,13 +201,13 @@ class AddPhonebookEntryGroup(ClientIDMutation):
         cls,
         root,
         info: graphene.ResolveInfo,
-        phonebook_entry_id: str,
+        entry_id: str,
         group: str,
     ) -> "AddPhonebookEntry":
         try:
             entry = PhonebookHandler().add_to_group(
                 user=info.context.user,
-                entry_id=int(validate_gid(phonebook_entry_id, "PhonebookEntryNode")),
+                entry_id=int(validate_gid(entry_id, "PhonebookEntryNode")),
                 group=group,
             )
             return cls(result=AddPhonebookEntryGroupSuccess(phonebook=entry))
@@ -232,7 +232,7 @@ class RemovePhonebookEntryGroupResult(graphene.Union):
 
 class RemovePhonebookEntryGroup(ClientIDMutation):
     class Input:
-        phonebook_entry_id = graphene.ID(required=True)
+        entry_id = graphene.ID(required=True)
         group = graphene.String(required=True)
 
     result = graphene.Field(RemovePhonebookEntryGroupResult)
@@ -243,13 +243,13 @@ class RemovePhonebookEntryGroup(ClientIDMutation):
         cls,
         root,
         info: graphene.ResolveInfo,
-        phonebook_entry_id: str,
+        entry_id: str,
         group: str,
     ) -> "RemovePhonebookEntryGroup":
         try:
             PhonebookHandler().remove_from_group(
                 user=info.context.user,
-                entry_id=int(validate_gid(phonebook_entry_id, "PhonebookEntryNode")),
+                entry_id=int(validate_gid(entry_id, "PhonebookEntryNode")),
                 group=group,
             )
             return cls(result=RemovePhonebookEntryGroupSuccess(is_deleted=True))
@@ -274,11 +274,11 @@ class AddPhonebookEntryNumberResult(graphene.Union):
 
 class AddPhonebookEntryNumber(ClientIDMutation):
     class Input:
-        phonebook_entry_id = graphene.ID(required=True)
+        entry_id = graphene.ID(required=True)
         number_type = NumberTypeEnum(required=True)
         number = graphene.String(required=True)
 
-    result = graphene.Field(AddPhonebookEntryNumberSuccess)
+    result = graphene.Field(AddPhonebookEntryNumberResult)
 
     @classmethod
     @login_required
@@ -286,14 +286,14 @@ class AddPhonebookEntryNumber(ClientIDMutation):
         cls,
         root,
         info: graphene.ResolveInfo,
-        phonebook_entry_id: str,
+        entry_id: str,
         number: str,
         number_type: str,
     ) -> "AddPhonebookEntryNumber":
         try:
             entry = PhonebookHandler().add_number(
                 user=info.context.user,
-                entry_id=int(validate_gid(phonebook_entry_id, "PhonebookEntryNode")),
+                entry_id=int(validate_gid(entry_id, "PhonebookEntryNode")),
                 number=number,
                 number_type=number_type,
             )
@@ -317,10 +317,9 @@ class RemovePhonebookEntryNumberResult(graphene.Union):
         types = (RemovePhonebookEntryNumberSuccess, RemovePhonebookEntryNumberError)
 
 
-class RemovePhonebookEntryNumberGroup(ClientIDMutation):
+class RemovePhonebookEntryNumber(ClientIDMutation):
     class Input:
-        phonebook_entry_id = graphene.ID(required=True)
-        group = graphene.String(required=True)
+        phonebook_number_id = graphene.ID(required=True)
 
     result = graphene.Field(RemovePhonebookEntryNumberResult)
 
@@ -330,12 +329,12 @@ class RemovePhonebookEntryNumberGroup(ClientIDMutation):
         cls,
         root,
         info: graphene.ResolveInfo,
-        phonebook_entry_id: str,
-    ) -> "RemovePhonebookEntryGroup":
+        phonebook_number_id: str,
+    ) -> "RemovePhonebookEntryNumber":
         try:
             PhonebookHandler().remove_number(
                 user=info.context.user,
-                entry_number_id=int(validate_gid(phonebook_entry_id, "PhonebookNumberNode")),
+                entry_number_id=int(validate_gid(phonebook_number_id, "PhonebookNumberNode")),
             )
             return cls(result=RemovePhonebookEntryNumberSuccess(is_deleted=True))
         except InputIdTypeMismatchError:
@@ -351,3 +350,4 @@ class Mutation(graphene.ObjectType):
     add_phonebook_entry_group = AddPhonebookEntryGroup.Field()
     remove_phonebook_entry_group = RemovePhonebookEntryGroup.Field()
     add_phonebook_entry_number = AddPhonebookEntryNumber.Field()
+    remove_phonebook_entry_number = RemovePhonebookEntryNumber.Field()

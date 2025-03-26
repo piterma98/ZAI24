@@ -38,16 +38,14 @@ class PhonebookFixture:
                 entry.groups.add(group)
         return entry
 
-    def add_phonebook_entry_number(self, entry: PhonebookEntry, number: str, number_type: str):
+    def add_phonebook_entry_number(self, entry: PhonebookEntry, number: str, number_type: str) -> PhonebookNumber:
         return PhonebookNumber.objects.create(
             phonebook_entry=entry,
             number=number,
             type=number_type,
         )
 
-    def add_phonebook_group(self, entry: PhonebookEntry, number: str, number_type: str):
-        return PhonebookNumber.objects.create(
-            phonebook_entry=entry,
-            number=number,
-            type=number_type,
-        )
+    def add_phonebook_group(self, entry: PhonebookEntry, name: str) -> PhonebookGroup:
+        group = PhonebookGroup.objects.create(name=name)
+        entry.groups.add(group)
+        return group

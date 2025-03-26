@@ -60,7 +60,7 @@ class PhonebookHandler:
                 )
         except ValidationError as e:
             logger.warning(f"Error while creating phonebook entry {e}")
-            raise PhonebookError(reason=f"Error while creating phonebook entry {e}")
+            raise PhonebookError(reason="Error while creating phonebook entry!")
         return phonebook_entry
 
     @transaction.atomic
@@ -134,7 +134,7 @@ class PhonebookHandler:
             return entry
         except PhonebookEntry.DoesNotExist as e:
             logger.error(f"Failed to add entry to group {e}")
-            raise PhonebookError(reason="Failed to add entry to group!") from e
+            raise PhonebookError(reason="Entry with given id does not exists!") from e
 
     @transaction.atomic
     def remove_from_group(self, user: User, entry_id: int, group: str) -> None:
@@ -179,4 +179,4 @@ class PhonebookHandler:
             return number.phonebook_entry
         except PhonebookNumber.DoesNotExist as e:
             logger.error(f"Failed to remove entry number {e}")
-            raise PhonebookError(reason="Failed to add entry number!") from e
+            raise PhonebookError(reason="Failed to remove entry number!") from e

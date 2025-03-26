@@ -37,11 +37,13 @@ class PhonebookEntry(TimeStampMixin, GrapheneModelMixin):
     )
     created_by = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, blank=True)
 
+    phonebook_number: models.QuerySet["PhonebookNumber"]
+
     def __str__(self) -> str:
         return f"PhonebookEntry({self.name=})"
 
 
-class PhonebookNumber(TimeStampMixin):
+class PhonebookNumber(TimeStampMixin, GrapheneModelMixin):
     phonebook_entry = models.ForeignKey(PhonebookEntry, on_delete=models.CASCADE, related_name="phonebook_number")
     number = models.TextField(max_length=20, null=True, validators=[MaxLengthValidator(20)])
     type = models.TextField(choices=PhonebookNumberTypeEnum.choices)
