@@ -65,9 +65,7 @@ class Query(graphene.ObjectType):
     phonebook_entry_count = graphene.Int()
 
     def resolve_phonebook_entry(self, info: graphene.ResolveInfo, **kwargs) -> QuerySet[PhonebookEntry]:
-        # check number of queries
         return PhonebookEntry.objects.prefetch_related("groups", "phonebook_number").all()
 
     def resolve_phonebook_entry_count(self, info: graphene.ResolveInfo, **kwargs) -> int:
-        # check number of queries
         return PhonebookEntry.objects.all().count()

@@ -181,3 +181,76 @@ def test_phonebook_entry_query_node(data_fixture, user_schema_client) -> None:
 
     assert "errors" not in result
     assert result["data"] == expected
+
+
+@pytest.mark.django_db
+def test_phonebook_entry_user_query(data_fixture, user_schema_client) -> None:
+    user = data_fixture.create_user()
+    user_2 = data_fixture.create_user()
+    entry_1 = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False)
+    data_fixture.add_phonebook_entry_number(entry_1, "500500500", "mobile")
+    entry_2 = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False)
+    data_fixture.add_phonebook_entry_number(entry_2, "226465020", "landline")
+    _ = data_fixture.create_phonebook_entry(created_by=user_2)
+    user_schema_client.user = user
+    query = """
+        query Me {
+          me {
+            myPhonebookEntries {
+              edges {
+                node {
+                  name
+                  city
+                  postalCode
+                  street
+                  country
+                  numbers {
+                    number
+                    type
+                  }
+                  groups
+                }
+              }
+            }
+          }
+        }
+        """
+    result = user_schema_client.execute(query)
+    expected = {
+        "me": {
+            "myPhonebookEntries": {
+                "edges": [
+                    {
+                        "node": {
+                            "name": entry_1.name,
+                            "city": entry_1.city,
+                            "postalCode": entry_1.postal_code,
+                            "street": entry_1.street,
+                            "country": entry_1.country,
+                            "numbers": [
+                                {"number": "500500500", "type": "mobile"},
+                            ],
+                            "groups": list(entry_1.groups.all().values_list("name", flat=True)),
+                        }
+                    },
+                    {
+                        "node": {
+                            "name": entry_2.name,
+                            "city": entry_2.city,
+                            "postalCode": entry_2.postal_code,
+                            "street": entry_2.street,
+                            "country": entry_2.country,
+                            "numbers": [
+                                {"number": "226465020", "type": "landline"},
+                            ],
+                            "groups": list(entry_2.groups.all().values_list("name", flat=True)),
+                        }
+                    },
+                ]
+            }
+        }
+    }
+
+    assert "errors" not in result
+    assert len(result["data"]["me"]["myPhonebookEntries"]["edges"]) == 2
+    assert result["data"] == expected
