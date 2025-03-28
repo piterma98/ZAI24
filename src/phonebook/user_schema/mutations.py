@@ -338,6 +338,48 @@ class RemovePhonebookEntryNumber(ClientIDMutation):
             return cls(result=RemovePhonebookEntryNumberError(reason=e.reason))
 
 
+class AddPhonebookEntryRatingSuccess(graphene.ObjectType):
+    phonebook = graphene.Field(PhonebookEntryNode)
+
+
+class AddPhonebookEntryRatingError(graphene.ObjectType):
+    reason = graphene.String()
+
+
+class AddPhonebookEntryRatingResult(graphene.Union):
+    class Meta:
+        types = (AddPhonebookEntryRatingSuccess, AddPhonebookEntryRatingError)
+
+
+class AddPhonebookEntryRatingGroup(ClientIDMutation):
+    class Input:
+        entry_id = graphene.ID(required=True)
+        rate = graphene.Int(required=True)
+
+    result = graphene.Field(AddPhonebookEntryRatingResult)
+
+    @classmethod
+    @login_required
+    def mutate_and_get_payload(
+        cls,
+        root,
+        info: graphene.ResolveInfo,
+        entry_id: str,
+        rate: int,
+    ) -> "AddPhonebookEntryRatingGroup":
+        try:
+            entry = PhonebookHandler().add_rating(
+                user=info.context.user,
+                entry_id=int(validate_gid(entry_id, "PhonebookEntryNode")),
+                rate=rate,
+            )
+            return cls(result=AddPhonebookEntryRatingSuccess(phonebook=entry))
+        except InputIdTypeMismatchError:
+            return cls(result=AddPhonebookEntryRatingError(reason="Invalid phonebook entry id!"))
+        except PhonebookError as e:
+            return cls(result=AddPhonebookEntryRatingError(reason=e.reason))
+
+
 class Mutation(graphene.ObjectType):
     add_phonebook_entry = AddPhonebookEntry.Field()
     update_phonebook_entry = UpdatePhonebookEntry.Field()
@@ -346,3 +388,4 @@ class Mutation(graphene.ObjectType):
     remove_phonebook_entry_group = RemovePhonebookEntryGroup.Field()
     add_phonebook_entry_number = AddPhonebookEntryNumber.Field()
     remove_phonebook_entry_number = RemovePhonebookEntryNumber.Field()
+    add_phonebook_entry_rate = AddPhonebookEntryRatingGroup.Field()

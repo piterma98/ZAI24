@@ -399,3 +399,55 @@ def test_phonebook_entry_remove_number_mutation(data_fixture, user_schema_client
     assert result["data"] == expected
     numbers = entry.phonebook_number.all()
     assert numbers.count() == 0
+
+
+@pytest.mark.django_db
+def test_phonebook_entry_add_rating_mutation(data_fixture, user_schema_client) -> None:
+    user = data_fixture.create_user()
+    entry = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False)
+    user_schema_client.user = user
+    query = """
+        mutation AddPhonebookEntryRate($id: ID!, $rate: Int!) {
+          addPhonebookEntryRate(input: {entryId: $id, rate: $rate}) {
+            result {
+              ... on AddPhonebookEntryRatingSuccess {
+                phonebook {
+                  id
+                  name
+                  city
+                  postalCode
+                  street
+                  country
+                  rating
+                }
+              }
+              ... on AddPhonebookEntryRatingError {
+                reason
+              }
+            }
+          }
+        }
+        """
+
+    variables = {"id": entry.gid, "rate": 1}
+    result = user_schema_client.execute(query, variables)
+    expected = {
+        "addPhonebookEntryRate": {
+            "result": {
+                "phonebook": {
+                    "id": entry.gid,
+                    "name": entry.name,
+                    "city": entry.city,
+                    "postalCode": entry.postal_code,
+                    "street": entry.street,
+                    "country": entry.country,
+                    "rating": "1.00",
+                }
+            }
+        }
+    }
+
+    assert "errors" not in result
+    assert result["data"] == expected
+    ratings = entry.phonebook_rating.all()
+    assert ratings.count() == 1

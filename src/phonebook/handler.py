@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from phonebook.exceptions import PhonebookError
-from phonebook.models import PhonebookEntry, PhonebookGroup, PhonebookNumber
+from phonebook.models import PhonebookEntry, PhonebookEntryRating, PhonebookGroup, PhonebookNumber
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -175,3 +175,19 @@ class PhonebookHandler:
         except PhonebookNumber.DoesNotExist as e:
             logger.error(f"Failed to remove entry number {e}")
             raise PhonebookError(reason="Failed to remove entry number!") from e
+
+    @transaction.atomic
+    def add_rating(self, entry_id: int, rate: int, user: User) -> PhonebookEntry:
+        try:
+            entry = PhonebookEntry.objects.get(id=entry_id)
+            if not (0 <= rate <= 6):
+                raise PhonebookError(reason="Invalid rating range. Range is 0 to 6")
+            PhonebookEntryRating.objects.create(
+                phonebook_entry=entry,
+                rate=rate,
+                created_by=user,
+            )
+            return entry
+        except PhonebookEntry.DoesNotExist as e:
+            logger.error(f"Failed to add entry rating {e}")
+            raise PhonebookError(reason="Failed to add entry rating!") from e

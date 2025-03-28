@@ -29,7 +29,7 @@ services:
       - "8000:8000"
     volumes:
       - type: bind
-        source: ./app/media/
-        target: /home/user/app/media
+        source: ./src/media/
+        target: /home/user/src/media
         bind:
           create_host_path: true

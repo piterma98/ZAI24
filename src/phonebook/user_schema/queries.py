@@ -1,5 +1,8 @@
+from decimal import Decimal
+
 import graphene
 from django.db.models import QuerySet
+from django.db.models.aggregates import Avg
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
@@ -35,6 +38,7 @@ class PhonebookEntryNode(DjangoObjectType):
     type = TypeEnum()
     numbers = graphene.List(PhonebookNumberNode)
     groups = graphene.List(graphene.String)
+    rating = graphene.Decimal()
 
     class Meta:
         model = PhonebookEntry
@@ -53,11 +57,14 @@ class PhonebookEntryNode(DjangoObjectType):
         except cls._meta.model.DoesNotExist:
             return None
 
-    def resolve_numbers(self, info: graphene.ResolveInfo) -> list[str]:
+    def resolve_numbers(self, info: graphene.ResolveInfo) -> QuerySet["PhonebookNumber"]:
         return self.phonebook_number.all()
 
     def resolve_groups(self, info: graphene.ResolveInfo) -> list[str]:
         return self.groups.all().values_list("name", flat=True)
+
+    def resolve_rating(self, info: graphene.ResolveInfo) -> Decimal:
+        return round(Decimal(self.phonebook_rating.aggregate(Avg("rate", default=0))["rate__avg"]), 2)
 
 
 class Query(graphene.ObjectType):

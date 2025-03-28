@@ -50,3 +50,12 @@ class PhonebookNumber(TimeStampMixin, GrapheneModelMixin):
 
     def __str__(self) -> str:
         return f"PhonebookNumber({self.phonebook_entry=}, {self.number=}, {self.type=})"
+
+
+class PhonebookEntryRating(TimeStampMixin, GrapheneModelMixin):
+    phonebook_entry = models.ForeignKey(PhonebookEntry, on_delete=models.CASCADE, related_name="phonebook_rating")
+    rate = models.PositiveIntegerField()
+    created_by = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"PhonebookNumberRating({self.phonebook_entry=}, {self.rate=}, {self.created_by})"

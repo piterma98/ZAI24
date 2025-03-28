@@ -332,3 +332,41 @@ def test_phonebook_handler_entry_remove_number_invalid_user(data_fixture) -> Non
         PhonebookHandler().remove_number(entry_number_id=number.id, user=user_2)
 
     assert e.value.reason == "You are not owner of this entry"
+
+
+@pytest.mark.django_db
+def test_phonebook_handler_entry_add_rating(data_fixture) -> None:
+    user = data_fixture.create_user()
+    entry = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False, create_groups=False)
+
+    PhonebookHandler().add_rating(entry_id=entry.id, rate=5, user=user)
+    PhonebookHandler().add_rating(entry_id=entry.id, rate=0, user=user)
+    PhonebookHandler().add_rating(entry_id=entry.id, rate=1, user=user)
+
+    numbers = entry.phonebook_rating.all()
+    assert numbers.count() == 3
+
+
+@pytest.mark.django_db
+def test_phonebook_handler_entry_add_rating_does_not_exists(data_fixture) -> None:
+    user = data_fixture.create_user()
+
+    with pytest.raises(PhonebookError) as e:
+        PhonebookHandler().add_rating(
+            entry_id=9999,
+            rate=5,
+            user=user,
+        )
+
+    assert e.value.reason == "Failed to add entry rating!"
+
+
+@pytest.mark.django_db
+def test_phonebook_handler_entry_add_rating_invalid_range(data_fixture) -> None:
+    user = data_fixture.create_user()
+    entry = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False, create_groups=False)
+
+    with pytest.raises(PhonebookError) as e:
+        PhonebookHandler().add_rating(entry_id=entry.id, rate=7, user=user)
+
+    assert e.value.reason == "Invalid rating range. Range is 0 to 6"

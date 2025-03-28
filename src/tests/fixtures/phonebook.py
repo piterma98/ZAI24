@@ -2,7 +2,8 @@ import random
 
 from faker import Faker
 
-from phonebook.models import PhonebookEntry, PhonebookGroup, PhonebookNumber
+from phonebook.models import PhonebookEntry, PhonebookEntryRating, PhonebookGroup, PhonebookNumber
+from users.models import User
 
 
 class PhonebookFixture:
@@ -49,3 +50,10 @@ class PhonebookFixture:
         group = PhonebookGroup.objects.create(name=name)
         entry.groups.add(group)
         return group
+
+    def add_phonebook_entry_rating(self, entry: PhonebookEntry, rate: int, user: User) -> PhonebookEntryRating:
+        return PhonebookEntryRating.objects.create(
+            phonebook_entry=entry,
+            rate=rate,
+            created_by=user,
+        )
