@@ -4,6 +4,7 @@ from typing import TypeVar
 from django.contrib import admin
 from django.db import models
 from django.db.models import Q, QuerySet, Value
+from django.http import HttpRequest
 from graphql_relay import to_global_id
 
 M = TypeVar("M", bound=models.Model)
@@ -18,9 +19,9 @@ class TimeStampMixin(models.Model):
 
 
 class BaseModelAdmin(admin.ModelAdmin):
-    def get_readonly_fields(self, request, obj=None) -> list[str] | tuple[str, ...]:
+    def get_readonly_fields(self, request: HttpRequest, obj: models.Model | None = None) -> list[str] | tuple[str, ...]:
         if obj:
-            return tuple(itertools.chain(self.readonly_fields, ("created_at", "updated_at")))
+            return tuple(itertools.chain(self.readonly_fields, ("created", "modified")))
         return self.readonly_fields
 
 
