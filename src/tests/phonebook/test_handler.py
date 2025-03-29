@@ -299,7 +299,7 @@ def test_phonebook_handler_entry_add_number_invalid_user(data_fixture) -> None:
 @pytest.mark.django_db
 def test_phonebook_handler_entry_remove_number(data_fixture) -> None:
     user = data_fixture.create_user()
-    entry = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False)
+    entry = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False, create_groups=False)
     number = data_fixture.add_phonebook_entry_number(entry, "500500500", "mobile")
 
     PhonebookHandler().remove_number(entry_number_id=number.id, user=user)

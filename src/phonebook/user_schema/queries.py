@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import graphene
 from django.db.models import QuerySet
-from django.db.models.aggregates import Avg
+from django.db.models.aggregates import Avg, Count
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
@@ -39,6 +39,7 @@ class PhonebookEntryNode(DjangoObjectType):
     numbers = graphene.List(PhonebookNumberNode)
     groups = graphene.List(graphene.String)
     rating = graphene.Decimal()
+    rating_count = graphene.Int()
 
     class Meta:
         model = PhonebookEntry
@@ -66,13 +67,20 @@ class PhonebookEntryNode(DjangoObjectType):
     def resolve_rating(self, info: graphene.ResolveInfo) -> Decimal:
         return round(Decimal(self.phonebook_rating.aggregate(Avg("rate", default=0))["rate__avg"]), 2)
 
+    def resolve_rating_count(self, info: graphene.ResolveInfo) -> int:
+        return self.rating__count
+
 
 class Query(graphene.ObjectType):
     phonebook_entry = DjangoFilterConnectionField(PhonebookEntryNode)
     phonebook_entry_count = graphene.Int()
 
     def resolve_phonebook_entry(self, info: graphene.ResolveInfo, **kwargs) -> QuerySet[PhonebookEntry]:
-        return PhonebookEntry.objects.prefetch_related("groups", "phonebook_number").all()
+        return (
+            PhonebookEntry.objects.annotate(rating__count=Count("phonebook_rating"))
+            .prefetch_related("groups", "phonebook_number")
+            .all()
+        )
 
     def resolve_phonebook_entry_count(self, info: graphene.ResolveInfo, **kwargs) -> int:
         return PhonebookEntry.objects.all().count()

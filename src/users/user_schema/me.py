@@ -1,5 +1,6 @@
 import graphene
 from django.db.models import QuerySet
+from django.db.models.aggregates import Count
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay import to_global_id
 
@@ -32,8 +33,10 @@ class Me(graphene.ObjectType):
         return self.user.lastname
 
     def resolve_my_phonebook_entries(self, info: graphene.ResolveInfo, **kwargs) -> QuerySet[PhonebookEntry]:
-        return PhonebookEntry.objects.prefetch_related("groups", "phonebook_number").filter(
-            created_by=info.context.user
+        return (
+            PhonebookEntry.objects.annotate(rating__count=Count("phonebook_rating"))
+            .prefetch_related("groups", "phonebook_number")
+            .filter(created_by=info.context.user)
         )
 
 

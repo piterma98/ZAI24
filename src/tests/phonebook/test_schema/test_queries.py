@@ -317,3 +317,57 @@ def test_phonebook_entry_rating_query(data_fixture, user_schema_client) -> None:
     assert "errors" not in result
     assert result["data"] == expected
     assert entry.phonebook_rating.all().count() == 3
+
+@pytest.mark.django_db
+def test_phonebook_entry_rating_count_query(data_fixture, user_schema_client) -> None:
+    user = data_fixture.create_user()
+    entry = data_fixture.create_phonebook_entry(created_by=user, create_numbers=False, create_groups=False)
+    data_fixture.add_phonebook_entry_rating(entry, 5, user)
+    data_fixture.add_phonebook_entry_rating(entry, 0, user)
+    data_fixture.add_phonebook_entry_rating(entry, 3, user)
+
+    user_schema_client.user = user
+    query = """
+            query Phonebook {
+              phonebookEntryCount
+              phonebookEntry {
+                edges {
+                  node {
+                    id
+                    name
+                    city
+                    postalCode
+                    street
+                    country
+                    rating
+                    ratingCount
+                  }
+                }
+              }
+            }
+           """
+
+    result = user_schema_client.execute(query)
+    expected = {
+        "phonebookEntryCount": 1,
+        "phonebookEntry": {
+            "edges": [
+                {
+                    "node": {
+                        "id": to_global_id("PhonebookEntryNode", entry.id),
+                        "name": entry.name,
+                        "city": entry.city,
+                        "postalCode": entry.postal_code,
+                        "street": entry.street,
+                        "country": entry.country,
+                        "rating": "2.67",
+                        "ratingCount": 3,
+                    }
+                }
+            ]
+        },
+    }
+
+    assert "errors" not in result
+    assert result["data"] == expected
+    assert entry.phonebook_rating.all().count() == 3
