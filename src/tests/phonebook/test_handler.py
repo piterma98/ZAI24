@@ -1,4 +1,5 @@
 import pytest
+from django.utils.text import slugify
 
 from phonebook.exceptions import PhonebookError
 from phonebook.handler import AddPhonebookEntryNumberData, PhonebookHandler
@@ -30,6 +31,7 @@ def test_phonebook_handler_create_entry(data_fixture) -> None:
     )
 
     assert entry.name == name
+    assert entry.slug == slugify(name)
     assert entry.city == city
     assert entry.street == street
     assert entry.postal_code == postal_code

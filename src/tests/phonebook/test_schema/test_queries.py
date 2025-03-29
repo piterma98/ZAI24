@@ -17,6 +17,7 @@ def test_phonebook_entry_query(data_fixture, user_schema_client) -> None:
             {
               node{
                 id
+                slug
                 name
                 city
                 postalCode
@@ -42,6 +43,7 @@ def test_phonebook_entry_query(data_fixture, user_schema_client) -> None:
                 {
                     "node": {
                         "id": to_global_id("PhonebookEntryNode", entry.id),
+                        "slug": entry.slug,
                         "name": entry.name,
                         "city": entry.city,
                         "postalCode": entry.postal_code,
@@ -94,6 +96,7 @@ def test_phonebook_entry_query_search(data_fixture, user_schema_client) -> None:
             {
               node{
                 id
+                slug
                 name
                 city
                 postalCode
@@ -119,6 +122,7 @@ def test_phonebook_entry_query_search(data_fixture, user_schema_client) -> None:
                 {
                     "node": {
                         "id": to_global_id("PhonebookEntryNode", entry.id),
+                        "slug": entry.slug,
                         "name": entry.name,
                         "city": entry.city,
                         "postalCode": entry.postal_code,
@@ -152,6 +156,7 @@ def test_phonebook_entry_query_node(data_fixture, user_schema_client) -> None:
           node(id: $id) {
             ... on PhonebookEntryNode {
               id
+              slug
               name
               city
               postalCode
@@ -173,6 +178,7 @@ def test_phonebook_entry_query_node(data_fixture, user_schema_client) -> None:
         "node": {
             "id": to_global_id("PhonebookEntryNode", entry.id),
             "name": entry.name,
+            "slug": entry.slug,
             "city": entry.city,
             "postalCode": entry.postal_code,
             "street": entry.street,
@@ -205,6 +211,7 @@ def test_phonebook_entry_user_query(data_fixture, user_schema_client) -> None:
             myPhonebookEntries {
               edges {
                 node {
+                  slug
                   name
                   city
                   postalCode
@@ -229,6 +236,7 @@ def test_phonebook_entry_user_query(data_fixture, user_schema_client) -> None:
                 "edges": [
                     {
                         "node": {
+                            "slug": entry_1.slug,
                             "name": entry_1.name,
                             "city": entry_1.city,
                             "postalCode": entry_1.postal_code,
@@ -243,6 +251,7 @@ def test_phonebook_entry_user_query(data_fixture, user_schema_client) -> None:
                     },
                     {
                         "node": {
+                            "slug": entry_2.slug,
                             "name": entry_2.name,
                             "city": entry_2.city,
                             "postalCode": entry_2.postal_code,
@@ -282,6 +291,7 @@ def test_phonebook_entry_rating_query(data_fixture, user_schema_client) -> None:
                {
                  node{
                    id
+                   slug
                    name
                    city
                    postalCode
@@ -302,6 +312,7 @@ def test_phonebook_entry_rating_query(data_fixture, user_schema_client) -> None:
                 {
                     "node": {
                         "id": to_global_id("PhonebookEntryNode", entry.id),
+                        "slug": entry.slug,
                         "name": entry.name,
                         "city": entry.city,
                         "postalCode": entry.postal_code,
@@ -317,6 +328,7 @@ def test_phonebook_entry_rating_query(data_fixture, user_schema_client) -> None:
     assert "errors" not in result
     assert result["data"] == expected
     assert entry.phonebook_rating.all().count() == 3
+
 
 @pytest.mark.django_db
 def test_phonebook_entry_rating_count_query(data_fixture, user_schema_client) -> None:
@@ -334,6 +346,7 @@ def test_phonebook_entry_rating_count_query(data_fixture, user_schema_client) ->
                 edges {
                   node {
                     id
+                    slug
                     name
                     city
                     postalCode
@@ -355,6 +368,7 @@ def test_phonebook_entry_rating_count_query(data_fixture, user_schema_client) ->
                 {
                     "node": {
                         "id": to_global_id("PhonebookEntryNode", entry.id),
+                        "slug": entry.slug,
                         "name": entry.name,
                         "city": entry.city,
                         "postalCode": entry.postal_code,

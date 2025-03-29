@@ -23,6 +23,7 @@ class PhonebookGroup(TimeStampMixin):
 
 
 class PhonebookEntry(TimeStampMixin, GrapheneModelMixin):
+    slug = models.SlugField(default="")
     name = models.TextField(max_length=300, validators=[MaxLengthValidator(300)])
     city = models.TextField(max_length=50, validators=[MaxLengthValidator(50)])
     street = models.TextField(max_length=50, validators=[MaxLengthValidator(50)])

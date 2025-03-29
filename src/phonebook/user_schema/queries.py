@@ -43,7 +43,7 @@ class PhonebookEntryNode(DjangoObjectType):
 
     class Meta:
         model = PhonebookEntry
-        fields = ("name", "city", "street", "postal_code", "country")
+        fields = ("slug", "name", "city", "street", "postal_code", "country")
         interfaces = (graphene.relay.Node,)
         filterset_class = PhonebookFilterSet
 
