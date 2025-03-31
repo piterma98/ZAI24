@@ -55,7 +55,7 @@ def test_phonebook_entry_add_mutation(data_fixture, user_schema_client) -> None:
         "postal_code": postal_code,
         "country": country,
         "type": type,
-        "groups": groups,
+        "groups": [group.lower() for group in groups],
         "numbers": numbers,
     }
     result = user_schema_client.execute(query, variables)
@@ -71,7 +71,7 @@ def test_phonebook_entry_add_mutation(data_fixture, user_schema_client) -> None:
                     "numbers": [
                         {"number": "500500500", "type": "mobile"},
                     ],
-                    "groups": groups,
+                    "groups": [group.lower() for group in groups],
                 }
             }
         }

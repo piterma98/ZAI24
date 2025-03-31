@@ -44,7 +44,7 @@ class PhonebookHandler:
             phonebook_entry.full_clean()
             group_list = []
             for group in groups:
-                phonebook_group, _ = PhonebookGroup.objects.get_or_create(name=group)
+                phonebook_group, _ = PhonebookGroup.objects.get_or_create(name=group.lower())
                 group_list.append(phonebook_group)
             phonebook_entry.groups.set(group_list)
             for number in numbers:
@@ -124,7 +124,7 @@ class PhonebookHandler:
             if entry.created_by != user:
                 logger.error("Failed to update entry")
                 raise PhonebookError(reason="You are not owner of this entry")
-            phonebook_group, _ = PhonebookGroup.objects.get_or_create(name=group)
+            phonebook_group, _ = PhonebookGroup.objects.get_or_create(name=group.lower())
             entry.groups.add(phonebook_group)
             return entry
         except PhonebookEntry.DoesNotExist as e:
